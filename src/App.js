@@ -2,7 +2,7 @@ import { Counter } from './features/counter/Counter';
 import './App.css';
 import Home from './pages/home'
 import SignupPage from './pages/SignupPage';
-import Cart from './features/cart/cart';
+import Cart from './features/cart/Cart';
 import CartPage from './pages/CartPage';
 
 import * as React from "react";
