@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { StarIcon } from '@heroicons/react/20/solid';
 import { RadioGroup } from '@headlessui/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllProductByIdAsync, selectProductById } from '../ProductSlice';
+import { fetchAllProductByIdAsync, selectProductById } from '../../product/ProductSlice';
 import { useParams } from 'react-router-dom';
-import { addToCartAsync, selectItems } from '../../cart/cartSlice';
+import { addToCartAsync } from '../../cart/cartSlice';
 import { selectLoggedInUser } from '../../auth/authSlice';
+import { discountedPrice } from '../../../app/constants';
 // TODO: In server data we will add colors, sizes , highlights. to each product
 const colors = [
   { name: 'White', class: 'bg-white', selectedClass: 'ring-gray-400' },
@@ -32,10 +33,9 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 // TODO : Loading UI  
-export default function ProductDetail() {
+export default function AdminProductDetail() {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [selectedSize, setSelectedSize] = useState(sizes[2]);
-  const items = useSelector(selectItems);
   const user = useSelector(selectLoggedInUser)
   const product = useSelector(selectProductById);
   const dispatch = useDispatch();
@@ -43,15 +43,9 @@ export default function ProductDetail() {
 
   const handleCart = (e)=>{
     e.preventDefault();
-    if(items.findIndex(item=>product.id===product.id)<0){
-      console.log({ items, product });
-      const newItem  = {...product, product:product.id, quantity:1, user:user.id }
-      delete newItem['id'];
-      dispatch(addToCartAsync(newItem)) 
-    }
-    else{
-      console.log('already added')
-    }
+    const newItem  = {...product,quantity:1,user:user.id }
+    delete newItem['id'];
+    dispatch(addToCartAsync(newItem)) 
   }
 
   useEffect(() => {
@@ -102,52 +96,6 @@ export default function ProductDetail() {
               </li>
             </ol>
           </nav>
-
-                   {/* Image gallery */}
-         
-                   {/* {product && product.images && product.images.length > 0 && (
-          <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
-              <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-                <img
-                  src={product.images[0]}
-                  alt={product.title}
-                  className="h-full w-full object-cover object-center"
-                />
-              </div>
-              </div>
-            )}
-          {product && product.images && product.images.length > 1 && (
-          <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
-              <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
-                <img
-                  src={product.images[1]}
-                  alt={product.title}
-                  className="h-full w-full object-cover object-center"
-                />
-              </div>
-              </div>
-            )}
-
-          {product && product.images && product.images.length > 2 && (
-              <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
-                <img
-                  src={product.images[2]}
-                  alt={product.title}
-                  className="h-full w-full object-cover object-center"
-                />
-              </div>
-            )}
-          {product && product.images && product.images.length > 3 && (
-
-              <div className="aspect-h-5 aspect-w-4 lg:aspect-h-4 lg:aspect-w-3 sm:overflow-hidden sm:rounded-lg">
-                <img
-                  src={product.images[3]}
-                  alt={product.title}
-                  className="h-full w-full object-cover object-center"
-                />
-              </div>
-            
-            )} */}
 
  <div className="flex flex-wrap justify-center">
   {/* First Row */}
@@ -206,6 +154,9 @@ export default function ProductDetail() {
   </div>
 </div>
 
+
+            
+
           {/* Product info */}
           <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16">
             <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
@@ -216,8 +167,11 @@ export default function ProductDetail() {
             {/* Options */}
             <div className="mt-4 lg:row-span-3 lg:mt-0">
               <h2 className="sr-only">Product information</h2>
-              <p className="text-3xl tracking-tight text-gray-900">
+              <p className="text-xl line-through tracking-tight text-gray-900">
                ${product.price}
+              </p>
+              <p className="text-3xl tracking-tight text-gray-900">
+               ${discountedPrice(product)}
               </p>
               {/* Reviews */}
               <div className="mt-6">
@@ -406,3 +360,51 @@ export default function ProductDetail() {
     </div>
   );
 }
+
+
+
+{/* Image gallery */}
+         
+                   {/* {product && product.images && product.images.length > 0 && (
+          <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
+              <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
+                <img
+                  src={product.images[0]}
+                  alt={product.title}
+                  className="h-full w-full object-cover object-center"
+                />
+              </div>
+              </div>
+            )}
+          {product && product.images && product.images.length > 1 && (
+          <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
+              <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
+                <img
+                  src={product.images[1]}
+                  alt={product.title}
+                  className="h-full w-full object-cover object-center"
+                />
+              </div>
+              </div>
+            )}
+
+          {product && product.images && product.images.length > 2 && (
+              <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
+                <img
+                  src={product.images[2]}
+                  alt={product.title}
+                  className="h-full w-full object-cover object-center"
+                />
+              </div>
+            )}
+          {product && product.images && product.images.length > 3 && (
+
+              <div className="aspect-h-5 aspect-w-4 lg:aspect-h-4 lg:aspect-w-3 sm:overflow-hidden sm:rounded-lg">
+                <img
+                  src={product.images[3]}
+                  alt={product.title}
+                  className="h-full w-full object-cover object-center"
+                />
+              </div>
+            
+            )} */}
